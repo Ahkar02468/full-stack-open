@@ -2,7 +2,7 @@
 
 sequenceDiagram
 
-    title 0.4 New note diagram
+    title 0.5 SPA Note Diagram
     participant Browser
     participant Server
 
@@ -10,13 +10,11 @@ sequenceDiagram
     Note over Browser : Browser will post request to the server
 
 
-    Browser ->> Server : HTTP POST https://studies.cs.helsinki.fi/exampleapp/new_note
+    Browser ->> Server : HTTP POST https://studies.cs.helsinki.fi/exampleapp/spa
 
-    Note over Server : Server create new note on the server side
+   Browser ->> Server : GET https://studies.cs.helsinki.fi/exampleapp/new_note_spa
 
-    Server -->> Browser : HTTP 302 - Url redirect to /notes and will cause reload of the page
-
-   Browser ->> Server : GET https://studies.cs.helsinki.fi/exampleapp/notes
+   Note over Server : Server create new note on the server side without refresh the browser(201 created code)
 
 
    Server -->> Browser : HTML document
@@ -25,10 +23,10 @@ sequenceDiagram
 
     Server -->> Browser : main.css
 
-    Browser ->> Server : GET https://studies.cs.helsinki.fi/exampleapp/main.js
+    Browser ->> Server : GET https://studies.cs.helsinki.fi/exampleapp/spa.js
 
-     Server -->> Browser : main.js
-     Note over Browser : browser starts executing main.js code that fetches data.json
+     Server -->> Browser : spa.js
+     Note over Browser : browser starts executing spa.js code that fetches data.json
 
       Browser ->> Server : GET https://studies.cs.helsinki.fi/exampleapp/data.json
 
