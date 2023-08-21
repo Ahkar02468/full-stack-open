@@ -2,14 +2,19 @@
 
 sequenceDiagram
 
-    title 0.5 SPA Diagram
+    title 0.5 New Note SPA Note Diagram
     participant Browser
     participant Server
+
+    Note over Browser : Input some text in input form
+    Note over Browser : Browser will post request to the server
 
 
     Browser ->> Server : HTTP POST https://studies.cs.helsinki.fi/exampleapp/spa
 
    Browser ->> Server : GET https://studies.cs.helsinki.fi/exampleapp/new_note_spa
+
+   Note over Server : Server create new note on the server side without refresh the browser(201 created code)
 
 
    Server -->> Browser : HTML document
@@ -24,6 +29,8 @@ sequenceDiagram
      Note over Browser : browser starts executing spa.js code that fetches data.json
 
       Browser ->> Server : GET https://studies.cs.helsinki.fi/exampleapp/data.json
+
+      Server -->> Browser: [{ "content": "HTML is easy", "date": "2023-1-1" }, ... ]
 
       Note over Browser : Notes from data.json added to the page
 ```
