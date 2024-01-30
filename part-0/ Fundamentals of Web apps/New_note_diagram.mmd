@@ -1,5 +1,3 @@
-```mermaid
-
 sequenceDiagram
 
     title 0.4 New note diagram
@@ -16,10 +14,10 @@ sequenceDiagram
 
     Server -->> Browser : HTTP 302 - Url redirect to /notes and will cause reload of the page
 
-   Browser ->> Server : GET https://studies.cs.helsinki.fi/exampleapp/notes
+    Browser ->> Server : GET https://studies.cs.helsinki.fi/exampleapp/notes
 
 
-   Server -->> Browser : HTML document
+    Server -->> Browser : HTML document
 
     Browser ->> Server : GET https://studies.cs.helsinki.fi/exampleapp/main.css
 
@@ -27,12 +25,11 @@ sequenceDiagram
 
     Browser ->> Server : GET https://studies.cs.helsinki.fi/exampleapp/main.js
 
-     Server -->> Browser : main.js
-     Note over Browser : browser starts executing main.js code that fetches data.json
+    Server -->> Browser : main.js
+    Note over Browser : browser starts executing main.js code that fetches data.json
 
-      Browser ->> Server : GET https://studies.cs.helsinki.fi/exampleapp/data.json
+    Browser ->> Server : GET https://studies.cs.helsinki.fi/exampleapp/data.json
 
-      Server -->> Browser: [{ "content": "HTML is easy", "date": "2023-1-1" }, ... ]
+    Server -->> Browser: [{ "content": "HTML is easy", "date": "2023-1-1" }, ... ]
 
-      Note over Browser : Notes from data.json added to the page
-```
+    Note over Browser : Notes from data.json added to the page
