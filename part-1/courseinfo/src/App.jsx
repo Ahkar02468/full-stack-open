@@ -1,10 +1,10 @@
 import { useState } from 'react'
 
-const Header = (props) => {
+const Header = ({course}) => {
   return (
     <>
       <div>
-        <h1>{props.course}</h1>
+        <h1>{course.name}</h1>
       </div>
     </>
   )
@@ -17,9 +17,9 @@ const Part = (part) => {
   )
 }
 
-const Content = ({parts}) => {
+const Content = ({course}) => {
   // console.log(parts[0].name);
-  const [part1, part2, part3] = parts;
+  const [part1, part2, part3] = course.parts;
   // console.log(first);
   // console.log(second);
   // console.log(thiird);
@@ -34,8 +34,8 @@ const Content = ({parts}) => {
   )
 }
 
-const Total = ({total}) => {
-  const [part1, part2, part3] = total;
+const Total = ({course}) => {
+  const [part1, part2, part3] = course.parts;
   // console.log(part1);
   // console.log(part2);
   // console.log(part3);
@@ -49,21 +49,25 @@ const Total = ({total}) => {
 }
 
 const App = () => {
-  const course = "Half stack application development.";
-  const parts = [
-    {
-      name: 'Fundamentals of React',
-      exercises: 10
-    },
-    {
-      name: 'Using props to pass data',
-      exercises: 7
-    },
-    {
-      name: 'State of a component',
-      exercises: 14
-    }
-  ]
+  const course = {
+    name: "Half stack application development.",
+    parts: [
+    
+      {
+        name: 'Fundamentals of React',
+        exercises: 10
+      },
+      {
+        name: 'Using props to pass data',
+        exercises: 7
+      },
+      {
+        name: 'State of a component',
+        exercises: 14
+      }
+    ]
+  }
+  
   // console.log(parts[0].name);
   // console.log(partsAndExercises[0].part1);
   // console.log(partsAndExercises[0].exercise1);
@@ -71,9 +75,9 @@ const App = () => {
     <>
       <div>
         <Header course={course}/>
-        <Content parts={parts}/>
+        <Content course={course}/>
 
-        <Total total={parts}/>
+        <Total course={course}/>
       </div>
     </>
   )
