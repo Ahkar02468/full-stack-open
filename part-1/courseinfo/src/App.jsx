@@ -1,10 +1,10 @@
-import { useState } from 'react'
+// import { useState } from 'react'
 
-const Header = ({course}) => {
+const Header = ({ header }) => {
   return (
     <>
       <div>
-        <h1>{course.name}</h1>
+        <h1>{header.name}</h1>
       </div>
     </>
   )
@@ -13,13 +13,13 @@ const Header = ({course}) => {
 const Part = (part) => {
   // console.log(part.name);
   return (
-    <p>{part.name} {part.exercises}.</p>
+    <p>{part.name} has {part.exercises} exercises.</p>
   )
 }
 
-const Content = ({course}) => {
+const Content = ({ content }) => {
   // console.log(parts[0].name);
-  const [part1, part2, part3] = course.parts;
+  const [part1, part2, part3] = content.parts;
   // console.log(first);
   // console.log(second);
   // console.log(thiird);
@@ -34,8 +34,8 @@ const Content = ({course}) => {
   )
 }
 
-const Total = ({course}) => {
-  const [part1, part2, part3] = course.parts;
+const Total = ({ total }) => {
+  const [part1, part2, part3] = total.parts;
   // console.log(part1);
   // console.log(part2);
   // console.log(part3);
@@ -74,10 +74,10 @@ const App = () => {
   return (
     <>
       <div>
-        <Header course={course}/>
-        <Content course={course}/>
+        <Header header={course}/>
+        <Content content={course}/>
 
-        <Total course={course}/>
+        <Total total={course}/>
       </div>
     </>
   )
