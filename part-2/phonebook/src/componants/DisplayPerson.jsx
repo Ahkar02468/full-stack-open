@@ -1,6 +1,9 @@
-const DisplayPerson = ({name, phone}) => {
+const DisplayPerson = ({name, phone, handleDelete}) => {
      return(
-       <h3>{name} {phone}</h3>
+      <div>
+        <span>{name} {phone} </span>
+        <button onClick={handleDelete}>Delete</button>
+      </div>
      )
    }
 
