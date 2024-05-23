@@ -33,7 +33,6 @@ let persons = [
           "name": "Mary update backened Poppendieck", 
           "number": "5151653122"
      },
-     ,
      {
           "id": 6,
           "name": "After deploy on render cloud and make changes from local", 
