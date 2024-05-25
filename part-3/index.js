@@ -94,7 +94,7 @@ const max = 9999999999;
 return Math.floor(Math.random() * (max - min + 1) + min);
 };
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
      const body = request.body
      if(body.name === undefined || body.name.length < 3){
      return response.status(400).json({ error: 'name lenght must be grater than 3' })
@@ -106,7 +106,7 @@ app.post('/api/persons', (request, response) => {
 
      person.save().then(savedPersoon => {
      response.json(savedPersoon)
-     })
+     }).catch(error => next(error))
 })
 
 app.put('/api/persons/:id', (request, response, next) => {
