@@ -1,46 +1,56 @@
-const express = require('express')
 require('dotenv').config()
+const express = require('express')
 const PhoneBook = require('./models/phonebook')
 const cors = require('cors')
 var morgan = require('morgan')
+const phonebook = require('./models/phonebook')
 const app = express()
 app.use(express.static('dist'))
 app.use(cors())
-app.use(express.json())
 morgan('tiny')
 
 let persons = [
      
  ]
 
- app.use(morgan((tokens, req, res) => {
-     return [
-       tokens.method(req, res),
-       tokens.url(req, res),
-       tokens.status(req, res),
-       tokens.res(req, res, 'content-length'), '-',
-       tokens['response-time'](req, res), 'ms',
-       JSON.stringify(req.body)
-     ].join(' ')
-   }))
+app.use(morgan((tokens, req, res) => {
+return [
+     tokens.method(req, res),
+     tokens.url(req, res),
+     tokens.status(req, res),
+     tokens.res(req, res, 'content-length'), '-',
+     tokens['response-time'](req, res), 'ms',
+     JSON.stringify(req.body)
+].join(' ')
+}))
 
-//  const requestLogger = (request, response, next) => {
-//      console.log('Method:', request.method)
-//      console.log('Path:  ', request.path)
-//      console.log('Body:  ', request.body)
-//      console.log('---')
-//      next()
-//    }
+const requestLogger = (request, response, next) => {
+console.log('Method:', request.method)
+console.log('Path:  ', request.path)
+console.log('Body:  ', request.body)
+console.log('---')
+next()
+}
    
-   app.use(express.json())
-//    app.use(requestLogger)
+const errorHandler = (error, request, response, next) => {
+console.error(error.message)
+
+if (error.name === 'CastError') {
+     return response.status(400).send({ error: 'malformatted id' })
+}
+
+next(error)
+}
    
-   const unknownEndpoint = (request, response) => {
-     response.status(404).send({ error: 'unknown endpoint' })
-   }
+app.use(express.json())
+app.use(requestLogger)
+   
+const unknownEndpoint = (request, response) => {
+response.status(404).send({ error: 'unknown endpoint' })
+}
 
 app.get('/', (request, response) => {
-     res.send('<h1>Hello World!</h1>')
+     response.send('<h1>Hello World!</h1>')
 })
 
 app.get('/api/persons', (request, response) => {
@@ -57,14 +67,44 @@ app.get('/api/persons/:id', (request, response) => {
 
 app.get('/info', (request, response) => {
      const date = new Date()
-     res.send(`<h3>Phonebook has info for ${persons.length} people.</h3><p>${date}</p>`)
+     PhoneBook.countDocuments({})
+       .then(count => {
+         response.send(`<h3>Phonebook has info for ${count} people.</h3></h3><p>${date}</p>`);
+       })
+       .catch(error => {
+         console.error(error);
+         response.status(500).send({ error: 'something went wrong' });
+       });
+   });
+
+app.delete('/api/persons/:id', (request, response, next) => {
+     // const id = Number(request.params.id);
+     // persons = persons.filter(person => person.id !== id);
+     // response.status(204).end();
+     PhoneBook.findByIdAndDelete(request.params.id)
+     .then(result  => {
+          response.status(204).end()
+     })
+     .catch(error => next(error))
+});
+
+app.put('/api/persons/:id', (request, response, next) => {
+     const body = request.body
+     const person = {
+          name: body.name,
+          number: body.number,
+        }
+
+     console.log('person; ', person)
+
+     PhoneBook.findByIdAndUpdate(request.params.id, person, {new: true})
+     .then(updatedPerson => {
+          response.json(updatedPerson)
+     })
+     .catch(error => next(error))
 })
 
-app.delete('/api/persons/:id', (request, response) => {
-     const id = Number(request.params.id);
-     persons = persons.filter(person => person.id !== id);
-     response.status(204).end();
-   });
+   
 
 const generateId = () => {
 const min = 1000000000;
@@ -88,6 +128,7 @@ app.post('/api/persons', (request, response) => {
 })
 
 app.use(unknownEndpoint)
+app.use(errorHandler)
 
 const PORT = process.env.PORT
 app.listen(PORT)

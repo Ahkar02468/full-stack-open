@@ -28,42 +28,41 @@ function App() {
     setphoneNumber(event.target.value)
   }
 
-  const checkName = (name) => {
-    return persons.find(person => person.name.toLowerCase() === name.toLowerCase())
+  const updatePerson = (person) => {
+    const ok = window.confirm(`${newName} is already added to phonebook, replace the number?`)
+    if (ok) {
+      
+      server.update(person.id, {...person, number: newNumber}).then((updatedPerson) => {
+        setPersons(persons.map(p => p.id !== person.id ? p :updatedPerson ))
+        setNewName('')
+        setphoneNumber('')
+        setMessage(`Phone number of '${person.name}' is changed...`)
+        setTimeout(() => {
+                  setMessage('')
+                }, 5000)
+      })
+      .catch(() => {
+        setMessage(`${person.name} has already been removed`)
+        setPersons(persons.filter(p => p.id !== person.id))
+      })
+
+      cleanForm()
+    }
   }
 
   const handleAddContact = (event) => {
     event.preventDefault()
+    const person = persons.find(p => p.name === newName)
+
+    if (person) {
+      updatePerson(person)
+      return
+    }
 
     const newPerson = {
       name: newName,
       number: phoneNumber
     }
-   
-    const existingPerson = checkName(newName)
-    
-    const changedPerson = { ...existingPerson, number:phoneNumber}
-
-    // console.log("existingPerson: ", existingPerson)
-    // console.log("changedPerson: ", changedPerson)
-
-    if(existingPerson && (existingPerson.number !== changedPerson.number)){
-      if(confirm(`${newName} is already added to phonebook, replace old number with the new one?`)){
-        server.update(existingPerson.id, changedPerson)
-        .then((returnObject) => {
-          console.log("Retuen obj: ",returnObject)
-          setPersons(persons.map(person => person.id !== existingPerson.id ? person : returnObject))
-          setNewName('')
-          setphoneNumber('')
-          setMessage(`Phone number of '${newName}' is changed...`)
-          setTimeout(() => {
-            setMessage('')
-          }, 5000)
-        })
-      }
-    }else if(existingPerson && (existingPerson.number === changedPerson.number)){
-      alert(`${newName} is already added to phonebook`)
-    }else{
       server.create(newPerson)
       .then(returnPerson => {
         setPersons(persons.concat(returnPerson))
