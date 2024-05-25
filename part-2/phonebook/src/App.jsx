@@ -52,6 +52,13 @@ function App() {
 
   const handleAddContact = (event) => {
       event.preventDefault()
+      if(newName.length <= 3){
+        setErrorMessage('Name lenght must be grater than 3')
+        setTimeout(() => {
+          setErrorMessage('')
+        }, 3000)
+        return
+      }
       const person = persons.find(p => p.name === newName)
 
       if (person) {
