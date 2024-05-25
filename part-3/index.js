@@ -1,4 +1,6 @@
 const express = require('express')
+require('dotenv').config()
+const PhoneBook = require('./models/phonebook')
 const cors = require('cors')
 var morgan = require('morgan')
 const app = express()
@@ -8,36 +10,7 @@ app.use(express.json())
 morgan('tiny')
 
 let persons = [
-     { 
-       "id": 1,
-       "name": "Arto Hellas", 
-       "number": "040-123456"
-     },
-     { 
-       "id": 2,
-       "name": "Ada Lovelace", 
-       "number": "39-44-5323523"
-     },
-     { 
-       "id": 3,
-       "name": "Dan Abramov", 
-       "number": "12-43-234345"
-     },
-     { 
-       "id": 4,
-       "name": "Mary Poppendieck", 
-       "number": "39-23-6423122"
-     },
-     {
-          "id": 5,
-          "name": "Mary update backened Poppendieck", 
-          "number": "5151653122"
-     },
-     {
-          "id": 6,
-          "name": "After deploy on render cloud and make changes from local", 
-          "number": "1651684"
-     }
+     
  ]
 
  app.use(morgan((tokens, req, res) => {
@@ -66,35 +39,31 @@ let persons = [
      response.status(404).send({ error: 'unknown endpoint' })
    }
 
-app.get('/', (req, res) => {
+app.get('/', (request, response) => {
      res.send('<h1>Hello World!</h1>')
 })
 
-app.get('/api/persons', (req, res) => {
-     res.json(persons)
+app.get('/api/persons', (request, response) => {
+     PhoneBook.find({}).then(persons => {
+          response.json(persons)
+        })
 })
 
-app.get('/api/persons/:id', (req, res) => {
-     const id = Number(req.params.id)
-     const person = persons.find(person => {
-          return person.id === id
-     })
-     if(person){
-          res.json(person)
-     }else{
-          res.status(404).end()
-     }
+app.get('/api/persons/:id', (request, response) => {
+     PhoneBook.findById(request.params.id).then(person => {
+          response.json(person)
+        })
 })
 
-app.get('/info', (req, res) => {
+app.get('/info', (request, response) => {
      const date = new Date()
      res.send(`<h3>Phonebook has info for ${persons.length} people.</h3><p>${date}</p>`)
 })
 
-app.delete('/api/persons/:id', (req, res) => {
-     const id = Number(req.params.id);
+app.delete('/api/persons/:id', (request, response) => {
+     const id = Number(request.params.id);
      persons = persons.filter(person => person.id !== id);
-     res.status(204).end();
+     response.status(204).end();
    });
 
 const generateId = () => {
@@ -103,35 +72,23 @@ const max = 9999999999;
 return Math.floor(Math.random() * (max - min + 1) + min);
 };
 
-app.post('/api/persons', (req, res) => {
-     const body = req.body
-     if(!body.number || !body.name){
-          return res.status(400).json({
-               error: ' name or number is missing...'
-          })
+app.post('/api/persons', (request, response) => {
+     const body = request.body
+     if(body.name === undefined){
+     return response.status(400).json({ error: 'name missing' })
      }
-
-     const isSamePerson = persons.find(person => {
-          return person.name === body.name
+     const person = new PhoneBook({
+     name: body.name,
+     number: body.number
      })
-     if(isSamePerson){
-          return res.status(400).json({
-               error: 'name must be unique'
-          })
-     }
 
-     const person = {
-          id: generateId(),
-          name: body.name,
-          number: body.number
-     }
-     // console.log(body)
-     persons = persons.concat(person)
-     res.json(person)
+     person.save().then(savedPersoon => {
+     response.json(savedPersoon)
+     })
 })
 
 app.use(unknownEndpoint)
 
-const PORT = process.env.PORT || 3002
+const PORT = process.env.PORT
 app.listen(PORT)
 console.log(`Server is running on port ${PORT}`)
