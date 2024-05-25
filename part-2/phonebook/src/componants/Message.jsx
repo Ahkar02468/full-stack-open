@@ -6,19 +6,19 @@ const DisplayMessage = ({message, type}) => {
                </div>
           )
         }else{
-         if(type === 'success'){
-          return (
-               <div className='message'>
-                    {message}
-               </div>
-          )
-         }else{
-          return (
-               <div className='error'>
-                    {message}
-               </div>
-          )
-         }
+          if(type === 'success'){
+               return (
+                    <div className='message'>
+                         {message}
+                    </div>
+               )
+          }else{
+               return (
+                    <div className='error'>
+                         {message}
+                    </div>
+               )
+          }
         }
 }
 

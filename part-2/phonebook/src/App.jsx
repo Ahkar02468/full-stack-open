@@ -51,18 +51,18 @@ function App() {
   }
 
   const handleAddContact = (event) => {
-    event.preventDefault()
-    const person = persons.find(p => p.name === newName)
+      event.preventDefault()
+      const person = persons.find(p => p.name === newName)
 
-    if (person) {
-      updatePerson(person)
-      return
-    }
+      if (person) {
+        updatePerson(person)
+        return
+      }
 
-    const newPerson = {
-      name: newName,
-      number: phoneNumber
-    }
+      const newPerson = {
+        name: newName,
+        number: phoneNumber
+      }
       server.create(newPerson)
       .then(returnPerson => {
         setPersons(persons.concat(returnPerson))
@@ -73,8 +73,9 @@ function App() {
         setNewName('')
         setphoneNumber('')
       })
+      .catch(error => console.log(error.response.data.error))
     }
-  }
+  // }
 
   const handleSearchTermChange  = (event) => {
     setSearchTerm(event.target.value)
@@ -110,7 +111,7 @@ function App() {
       <h2>Phonebook</h2>
       <Message message={message} type='success'/>
       <Message message={errorMesage} type='error'/>
-      <ShowFilter value={searchTerm} handleOnChange={handleSearchTermChange }/>
+      <ShowFilter value={searchTerm} handleOnChange={handleSearchTermChange}/>
       <h2>add a new</h2>
       <InputForm inputName={newName} inputPh={phoneNumber} handleName={handleNewNameChange} handlePh={handlePhoneNumberChange} handleSubmit={handleAddContact}/>
       <h2>Numbers</h2>
