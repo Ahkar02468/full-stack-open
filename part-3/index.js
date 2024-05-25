@@ -86,25 +86,7 @@ app.delete('/api/persons/:id', (request, response, next) => {
           response.status(204).end()
      })
      .catch(error => next(error))
-});
-
-app.put('/api/persons/:id', (request, response, next) => {
-     const body = request.body
-     const person = {
-          name: body.name,
-          number: body.number,
-        }
-
-     console.log('person; ', person)
-
-     PhoneBook.findByIdAndUpdate(request.params.id, person, {new: true})
-     .then(updatedPerson => {
-          response.json(updatedPerson)
-     })
-     .catch(error => next(error))
-})
-
-   
+}); 
 
 const generateId = () => {
 const min = 1000000000;
@@ -114,8 +96,8 @@ return Math.floor(Math.random() * (max - min + 1) + min);
 
 app.post('/api/persons', (request, response) => {
      const body = request.body
-     if(body.name === undefined){
-     return response.status(400).json({ error: 'name missing' })
+     if(body.name === undefined || body.name.length < 3){
+     return response.status(400).json({ error: 'name lenght must be grater than 3' })
      }
      const person = new PhoneBook({
      name: body.name,
@@ -125,6 +107,20 @@ app.post('/api/persons', (request, response) => {
      person.save().then(savedPersoon => {
      response.json(savedPersoon)
      })
+})
+
+app.put('/api/persons/:id', (request, response, next) => {
+     const body = request.body
+     const person = {
+          name: body.name,
+          number: body.number,
+        }
+
+     PhoneBook.findByIdAndUpdate(request.params.id, person, {new: true})
+     .then(updatedPerson => {
+          response.json(updatedPerson)
+     })
+     .catch(error => next(error))
 })
 
 app.use(unknownEndpoint)
