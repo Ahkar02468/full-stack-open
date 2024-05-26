@@ -32,7 +32,7 @@ function App() {
     const ok = window.confirm(`${newName} is already added to phonebook, replace the number?`)
     if (ok) {
       
-      server.update(person.id, {...person, number: newNumber}).then((updatedPerson) => {
+      server.update(person.id, {...person, number: phoneNumber}).then((updatedPerson) => {
         setPersons(persons.map(p => p.id !== person.id ? p :updatedPerson ))
         setNewName('')
         setphoneNumber('')
@@ -45,8 +45,6 @@ function App() {
         setMessage(`${person.name} has already been removed`)
         setPersons(persons.filter(p => p.id !== person.id))
       })
-
-      cleanForm()
     }
   }
 
@@ -98,7 +96,7 @@ function App() {
             setMessage('')
           }, 5000)
     })
-    .catch(error => {
+    .catch(() => {
 
       setErrorMessage(
         `Person '${person.name}' was already removed from server..`
