@@ -3,7 +3,6 @@ const express = require('express')
 const PhoneBook = require('./models/phonebook')
 const cors = require('cors')
 var morgan = require('morgan')
-const phonebook = require('./models/phonebook')
 const app = express()
 app.use(express.static('dist'))
 app.use(cors())
@@ -33,13 +32,16 @@ next()
 }
    
 const errorHandler = (error, request, response, next) => {
-console.error(error.message)
+     console.log(error.name , error.name === 'ValidationError')
 
-if (error.name === 'CastError') {
-     return response.status(400).send({ error: 'malformatted id' })
-}
+     if (error.name === 'CastError') {
+          return response.status(400).send({ error: 'malformatted id' })
+     }else if (error.name === 'ValidationError') {
+          console.log('====')
+          return res.status(400).json({ error: error.message })
+     }
 
-next(error)
+     next(error)
 }
    
 app.use(express.json())
@@ -78,21 +80,12 @@ app.get('/info', (request, response) => {
    });
 
 app.delete('/api/persons/:id', (request, response, next) => {
-     // const id = Number(request.params.id);
-     // persons = persons.filter(person => person.id !== id);
-     // response.status(204).end();
      PhoneBook.findByIdAndDelete(request.params.id)
      .then(result  => {
           response.status(204).end()
      })
      .catch(error => next(error))
-}); 
-
-const generateId = () => {
-const min = 1000000000;
-const max = 9999999999;
-return Math.floor(Math.random() * (max - min + 1) + min);
-};
+});
 
 app.post('/api/persons', (request, response, next) => {
      const body = request.body
@@ -104,9 +97,11 @@ app.post('/api/persons', (request, response, next) => {
      number: body.number
      })
 
-     person.save().then(savedPersoon => {
+     person.save()
+     .then(savedPersoon => {
      response.json(savedPersoon)
-     }).catch(error => next(error))
+     })
+     .catch(error => next(error))
 })
 
 app.put('/api/persons/:id', (request, response, next) => {
