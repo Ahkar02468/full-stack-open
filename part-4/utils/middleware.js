@@ -9,20 +9,24 @@ const requestLogger = (request, response, next) => {
   next()
 }
 
-// const tokenExtractor = (request, response, next) => {
-//   const authorization = request.get('authorization')
-//      if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
-//       request["token"] = authorization.substring(7)
-//      }
-//      next()
-// }
-
 const tokenExtractor = (request, response, next) => {
   const authorization = request.get('authorization')
   if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
     request["token"] = authorization.substring(7)
-    console.log('Token extracted:', request.token) // Add this logging statement
+    // console.log('Token extracted:', request.token) // Add this logging statement
   }
+  next()
+}
+
+const userExtractor = (request, response, next) => {
+  if(!request.token){
+    return response.status(401).json({ error: 'token missing' })
+  }
+  const decodedToken = jwt.verify(request.token, process.env.SECRET)
+  if (!decodedToken.id) {
+    return response.status(401).json({ error: 'token missing or invalid' })
+  }
+  request.user = decodedToken
   next()
 }
 
@@ -54,5 +58,6 @@ module.exports = {
   requestLogger,
   unknownEndpoint,
   errorHandler,
-  tokenExtractor
+  tokenExtractor,
+  userExtractor
 }
