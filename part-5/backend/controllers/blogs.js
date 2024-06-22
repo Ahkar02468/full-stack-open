@@ -2,15 +2,7 @@ const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 const User = require('../models/user')
 const jwt = require('jsonwebtoken')
-const middleware = require('../utils/middleware')
-
-const getTokenFrom = request => {
-     const authorization = request.get('authorization')
-     if (authorization && authorization.toLowerCase().startsWith('bearer ')) {
-          return authorization.substring(7)
-     }
-     return null
-}
+const userExtractor  = require('../utils/middleware').userExtractor;
 
 blogsRouter.get('/', async (request, response) => {
      const blogs = await Blog
@@ -19,33 +11,37 @@ blogsRouter.get('/', async (request, response) => {
      response.json(blogs)
 })
    
-blogsRouter.post('/', async (request, response, next) => {
-     const body = request.body
+blogsRouter.post('/', userExtractor, async (request, response) => {
+     console.log(request.body)
+     const { title, url, likes, author } = request.body;
 
-     // console.log("request.token: ", request.token)
-     // const decodedToken = jwt.verify(request.token, process.env.SECRET)
-
-     // if (!decodedToken.id) {
-     //      return response.status(401).json({ error: 'token missing or invalid in blogs' })
-     // }
-     if (body.title === undefined || body.url === undefined) {
-          return response.status(400).json({ error: 'title or url is missing' })
+     if (!request.user) {
+       return response.status(401).json({ error: 'token missing or invalid' });
      }
-     console.log("request.user.id: ", request.user.id)
-     const user = await User.findById(request.user.id)
+     const user = request.user;
+   
      const blog = new Blog({
-          title: body.title,
-          author: body.author,
-          url: body.url,
-          likes: body.likes,
-          user: user._id
-     })
-
-     const savedBlog = await blog.save()
-     user.blogs = user.blogs.concat(savedBlog._id)
-     await user.save()
-
-     response.status(201).json(savedBlog)
+       title,
+       author,
+       url,
+       likes,
+       user: user.id,
+     });
+   
+     if (!(blog.title || blog.author || blog.url)) {
+       return response
+         .status(400)
+         .json({ error: 'title, author or url are required' })
+         .end();
+     }
+     if (!blog.likes) {
+       blog.likes = 0;
+     }
+     // await blog.populate('user', 'username name id');
+     const savedBlog = await blog.save();
+     user.blogs = user.blogs.concat(savedBlog.id);
+     await user.save();
+     response.status(201).json(savedBlog);
 })
 
 blogsRouter.get('/:id', async (request, response) => {
