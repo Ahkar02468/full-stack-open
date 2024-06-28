@@ -1,4 +1,5 @@
 const blogsRouter = require('express').Router()
+const { response } = require('express');
 const Blog = require('../models/blog')
 const User = require('../models/user')
 const jwt = require('jsonwebtoken')
@@ -12,7 +13,7 @@ blogsRouter.get('/', async (request, response) => {
 })
    
 blogsRouter.post('/', userExtractor, async (request, response) => {
-     console.log(request.body)
+     // console.log(request.body)
      const { title, url, likes, author } = request.body;
 
      if (!request.user) {
@@ -53,7 +54,7 @@ blogsRouter.get('/:id', async (request, response) => {
      }
 })
 
-blogsRouter.delete('/:id', async (request, response, next) => {
+blogsRouter.delete('/:id',userExtractor, async (request, response, next) => {
      // const decodedToken = jwt.verify(request.token, process.env.SECRET)
      const userToCompare = await User.findById(request.user.id)
      const blogToDelete = await Blog.findById(request.params.id)
@@ -71,16 +72,22 @@ blogsRouter.delete('/:id', async (request, response, next) => {
      }
 })
 
-blogsRouter.put('/:id', async (request, response) => {
-     const body = request.body
-     const blog = {
-          title: body.title,
-          author: body.author,
-          url: body.url,
-          likes: body.likes
+
+blogsRouter.put('/:id',userExtractor, async (request, response) => {
+     const { title, url, likes, author } = request.body;
+     if(!title || !url || !likes || !author){
+          return response.status(400).json({error: 'All information must be provided.'})
      }
-     const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, { new: true })
-     response.json(updatedBlog)
+     const updateBlog = {
+          title,
+          url,
+          likes,
+          author
+     }
+     const updatedBlogPost = await Blog.findByIdAndUpdate(request.params.id, updateBlog, {new: true})
+
+     return response.status(200).json(updatedBlogPost)
+
 })
 
 module.exports = blogsRouter

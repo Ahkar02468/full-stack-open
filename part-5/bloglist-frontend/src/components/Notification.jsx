@@ -7,7 +7,7 @@ const Notification = ({ message }) => {
     padding: 10,
     color: !message ? null : message.type === 'error' ? 'red' : 'green',
     marginBottom: 10,
-  };
+  }
 
   return message ? (
     <div
@@ -16,8 +16,8 @@ const Notification = ({ message }) => {
     >
       {message.message}
     </div>
-  ) : null;
-};
+  ) : null
+}
 
-   
+
 export default Notification
